@@ -2,10 +2,119 @@
 <html lang ="en" dir="ltr">
     <head>
         <meta charset="utf-8">
-        <title>DOCUMENTATION</title>
+        <title>My Movie API Documentation</title>
     </head>
     <body>
-        <h1>Documentation Page</h1>
-        <p>The goal of this API is to provide the user with access to information about movies. Data will be broken up in different catergories such as titles, directors, and genres. A User will be able to sign up, update their personal information, and create a list of their favorite movies!</p>
+        <header>
+            <h1>My Movie API Documentation</h1>
+        </header>
+        <div>
+            <h2>My Movie API</h2>
+            <p>
+                This is a REST API that interacts with a database to provide the user with access to information about movies. Data will be broken up in different catergories such as titles, directors, and genres. A User will be able to sign up, update their personal information, and even create a list of their favorite movies!
+            </p>
+
+            <h2>Features:</h2>
+            <ul>
+                <li>Return a list of all movies in database to user.</li>
+                <li>Return data about a single, specified movie to user.</li>
+                <li>Return data about a specified genre to user.</li>
+                <li>Return data about a specified director to user.</li>
+                <li>Allow new users to register.</li>
+                <li>Allow users to update their user name.</li>
+                <li>Allow users to add a movie to their list of favorites.</li>
+                <li>Allow users to remove a movie from their list of favorites.</li>
+                <li>Allow existing users to deregister their account.</li>
+            </ul>
+        </div>
+        <div>
+            <h2>API Endpoints</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Business Logic</th>
+                        <th>URL</th>
+                        <th>HTTP Method</th>
+                        <th>Query Parameters</th>
+                        <th>Request body data format</th>
+                        <th>Response body data format</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Get a list of all movies</td>
+                        <td>/movies</td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about all movies</td>
+                    </tr>
+                    <tr>
+                        <td>Get data about a single movie by title</td>
+                        <td>/movies/:title</td>
+                        <td>GET</td>
+                        <td>:title</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about the specified movie</td>
+                    </tr>
+                    <tr>
+                        <td>Get data about a movie genre by genre name</td>
+                        <td>/movies/genres/:genreName</td>
+                        <td>GET</td>
+                        <td>:genreName</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about the specified genre, not directly related to any movie</td>
+                    </tr>
+                    <tr>
+                        <td>Get data about a director by director name</td>
+                        <td>/movies/directors/:directorName</td>
+                        <td>GET</td>
+                        <td>:directorName</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about the director, not directly related to any movie</td>
+                    </tr>
+                    <tr>
+                        <td>Allow new user to register</td>
+                        <td>/users</td>
+                        <td>POST</td>
+                        <td>-</td>
+                        <td>JSON object holding data to add to user profile. Structure: {"name":"Aaron Example", "favoriteMovies":["Example the Movie"]}</td>
+                        <td>JSON object holding data to add to user profile. Structure: {"name":"Aaron Example", "favoriteMovies":["Example the Movie"], "id":"1234567890"}</td>
+                    </tr>
+                    <tr>
+                        <td>Allow user to update user name</td>
+                        <td>/users/:id</td>
+                        <td>PUT</td>
+                        <td>:id</td>
+                        <td>JSON object holding new name desired by user. Structure: {"name":"Aaron Updated"}</td>
+                        <td>JSON object holding all data about user, including updated name. Structure: {"name":"Aaron Updated", "favoriteMovies":["Example the Movie"], "id":"1234567890"}</td>
+                    </tr>
+                    <tr>
+                        <td>Allow user to add movie to favorite list</td>
+                        <td>/users/:id/:movieTitle</td>
+                        <td>PUT</td>
+                        <td>:id, :movieTitle</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about user, including newly added movie title in favoriteMovies array.</td>
+                    </tr>
+                    <tr>
+                        <td>Allow user to remove movie from favorite list</td>
+                        <td>/users/:id/remove/:movieTitle</td>
+                        <td>DELETE</td>
+                        <td>:id, :movieTitle</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about user, excluding removed movie title from favoriteMovies array.</td>
+                    </tr>
+                    <tr>
+                        <td>Allow existing user to deregister</td>
+                        <td>/users/:id/removeAccount</td>
+                        <td>DELETE</td>
+                        <td>:id</td>
+                        <td>-</td>
+                        <td>A text string confirming that the account has been deleted.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </body>
 </html>
