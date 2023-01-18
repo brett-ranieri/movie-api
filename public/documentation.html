@@ -20,6 +20,7 @@
                 <li>Return data about a single, specified movie to user.</li>
                 <li>Return data about a specified genre to user.</li>
                 <li>Return data about a specified director to user.</li>
+                <li>Return data about a movie with a specified genre and specified director to user.</li>
                 <li>Allow new users to register.</li>
                 <li>Allow users to update their user name.</li>
                 <li>Allow users to add a movie to their list of favorites.</li>
@@ -74,20 +75,28 @@
                         <td>JSON object holding all data about the director, not directly related to any movie</td>
                     </tr>
                     <tr>
+                        <td>Get data about a movie with a certain genre and a certain director name</td>
+                        <td>/movies/genres/:genreName/directors/:directorName</td>
+                        <td>GET</td>
+                        <td>:genreName, :directorName</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about the director, not directly related to any movie</td>
+                    </tr>
+                    <tr>
                         <td>Allow new user to register</td>
                         <td>/users</td>
                         <td>POST</td>
                         <td>-</td>
-                        <td>JSON object holding data to add to user profile. Structure: {"name":"Aaron Example", "favoriteMovies":["Example the Movie"]}</td>
-                        <td>JSON object holding data to add to user profile. Structure: {"name":"Aaron Example", "favoriteMovies":["Example the Movie"], "id":"1234567890"}</td>
+                        <td>JSON object holding data to add to user profile. Structure: {"Name":"Aaron Example", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":new Date"1988-01-02"}</td>
+                        <td>JSON object holding data to add to user profile. Structure: {"Name":"Aaron Example", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":ISO"1988-01-02"}</td>
                     </tr>
                     <tr>
                         <td>Allow user to update user name</td>
                         <td>/users/:id</td>
                         <td>PUT</td>
                         <td>:id</td>
-                        <td>JSON object holding new name desired by user. Structure: {"name":"Aaron Updated"}</td>
-                        <td>JSON object holding all data about user, including updated name. Structure: {"name":"Aaron Updated", "favoriteMovies":["Example the Movie"], "id":"1234567890"}</td>
+                        <td>JSON object holding new name desired by user. Structure: {"Name":"Aaron Updated"}</td>
+                        <td>JSON object holding all data about user, including updated name. Structure: {"Name":"Aaron Updated", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":ISO"1988-01-02"}</td>
                     </tr>
                     <tr>
                         <td>Allow user to add movie to favorite list</td>
