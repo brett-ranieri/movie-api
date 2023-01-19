@@ -22,7 +22,9 @@
                 <li>Return data about a specified director to user.</li>
                 <li>Return data about a movie with a specified genre and specified director to user.</li>
                 <li>Allow new users to register.</li>
-                <li>Allow users to update their user name.</li>
+                <li>Return a list of all users</li>
+                <li>Allow users to update their saved information</li>
+                <li>Return user information by Username</li>
                 <li>Allow users to add a movie to their list of favorites.</li>
                 <li>Allow users to remove a movie from their list of favorites.</li>
                 <li>Allow existing users to deregister their account.</li>
@@ -56,7 +58,7 @@
                         <td>GET</td>
                         <td>:title</td>
                         <td>-</td>
-                        <td>JSON object holding all data about the specified movie</td>
+                        <td>JSON object holding all data about the specified movie. <br> Structure: <br> { <br>"Genre": {"Name": "Example", "Description": "Example Description"}, <br> "Director": {"Name": "Example Name", "Bio": "Example Bio", "Birth": "Year as String", "Death": "Year as String"}, <br> "Actors": [], <br> "_id": "65666hgklkljsdf8", <br> "Title": "Example Title", <br> "Description": "Example Description", <br> "ImagePath": "url for Image to be used", <br> "Featured": Boolean <br> }</td>
                     </tr>
                     <tr>
                         <td>Get data about a movie genre by genre name</td>
@@ -64,7 +66,7 @@
                         <td>GET</td>
                         <td>:genreName</td>
                         <td>-</td>
-                        <td>JSON object holding all data about the specified genre, not directly related to any movie</td>
+                        <td>JSON object holding all data about the specified genre, not directly related to any movie <br> Structure: <br> "Genre": {"Name": "Example", "Description": "Example Description"}</td>
                     </tr>
                     <tr>
                         <td>Get data about a director by director name</td>
@@ -72,7 +74,7 @@
                         <td>GET</td>
                         <td>:directorName</td>
                         <td>-</td>
-                        <td>JSON object holding all data about the director, not directly related to any movie</td>
+                        <td>JSON object holding all data about the director, not directly related to any movie <br> Structure: <br> "Director": {"Name": "Example Name", "Bio": "Example Bio", "Birth": "Year as String", "Death": "Year as String"}</td>
                     </tr>
                     <tr>
                         <td>Get data about a movie with a certain genre and a certain director name</td>
@@ -80,45 +82,61 @@
                         <td>GET</td>
                         <td>:genreName, :directorName</td>
                         <td>-</td>
-                        <td>JSON object holding all data about the director, not directly related to any movie</td>
+                        <td>JSON object holding all data about a movie that has matching genre and director</td>
                     </tr>
                     <tr>
                         <td>Allow new user to register</td>
                         <td>/users</td>
                         <td>POST</td>
-                        <td>-</td>
-                        <td>JSON object holding data to add to user profile. Structure: {"Name":"Aaron Example", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":new Date"1988-01-02"}</td>
-                        <td>JSON object holding data to add to user profile. Structure: {"Name":"Aaron Example", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":ISO"1988-01-02"}</td>
+                        <td>User MUST provide the following in the request body: <br> Name <br> Username <br> Password <br> Email <br> Birthday is an optional field.</td>
+                        <td>JSON object holding data to add to user profile. <br> Structure: <br> {"Name":"Aaron Example" (Required), "Username":"aaron.example" (Required), "Password":"THISisApassword" (Required), "Email":"aaron.example@yahoo.com" (Required), "Birthday":new Date"1988-01-02"}</td>
+                        <td>JSON object holding data to add to user profile. <br> Structure: <br> {"Name":"Aaron Example", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":ISO"1988-01-02"}, "FavoriteMovies":[], "_id":"*generated ID number*", "__v": 0</td>
                     </tr>
                     <tr>
-                        <td>Allow user to update user name</td>
-                        <td>/users/:id</td>
+                        <td>Get a list of all users</td>
+                        <td>/users</td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about all users</td>
+                    </tr>
+                    <tr>
+                        <td>Return user by username</td>
+                        <td>/users/:Username</td>
+                        <td>GET</td>
+                        <td>:Username</td>
+                        <td>-</td>
+                        <td>JSON object holding all data about specified user. <br> Structure: <br> {"Name":"Aaron Updated", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":ISO"1988-01-02"}, "FavoriteMovies":[], "_id":"*generated ID number*", "__v": 0</td>
+                    </tr>
+                    <tr>
+                        <td>Allow user to update keys by username</td>
+                        <td>/users/:Username</td>
                         <td>PUT</td>
-                        <td>:id</td>
-                        <td>JSON object holding new name desired by user. Structure: {"Name":"Aaron Updated"}</td>
-                        <td>JSON object holding all data about user, including updated name. Structure: {"Name":"Aaron Updated", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":ISO"1988-01-02"}</td>
+                        <td>:Username <br> User must provide values for keys they want to update in response body. Can update the following: <br> Name <br> Username <br> Password <br> Email <br> Birthday</td>
+                        <td>JSON object holding new key values desired by user, taken from request body. <br> EXAMPLE - Updating Name: <br> Structure: <br> {"Name":"Aaron Updated"} <br> *Note - not all fields are required for updates, just need a value for any key user wants to update.</td>
+                        <td>JSON object holding all data about user, including updated values provided in request body. <br> Structure: <br> {"Name":"Aaron Updated", "Username":"aaron.example", "Password":"THISisApassword", "Email":"aaron.example@yahoo.com", "Birthday":ISO"1988-01-02"}</td>
                     </tr>
                     <tr>
                         <td>Allow user to add movie to favorite list</td>
-                        <td>/users/:id/:movieTitle</td>
+                        <td>/users/:Username/movies/:MovieID</td>
                         <td>PUT</td>
-                        <td>:id, :movieTitle</td>
+                        <td>:Username, :MovieID</td>
                         <td>-</td>
-                        <td>JSON object holding all data about user, including newly added movie title in favoriteMovies array.</td>
+                        <td>JSON object holding all data about user, including newly added MovieID in FavoriteMovies array.</td>
                     </tr>
                     <tr>
                         <td>Allow user to remove movie from favorite list</td>
-                        <td>/users/:id/remove/:movieTitle</td>
+                        <td>/users/:Username/remove/:MovieID</td>
                         <td>DELETE</td>
-                        <td>:id, :movieTitle</td>
+                        <td>:Username, :MovieID</td>
                         <td>-</td>
-                        <td>JSON object holding all data about user, excluding removed movie title from favoriteMovies array.</td>
+                        <td>JSON object holding all data about user, excluding removed MovieID from FavoriteMovies array.</td>
                     </tr>
                     <tr>
                         <td>Allow existing user to deregister</td>
-                        <td>/users/:id/removeAccount</td>
+                        <td>/users/:Username</td>
                         <td>DELETE</td>
-                        <td>:id</td>
+                        <td>:Username</td>
                         <td>-</td>
                         <td>A text string confirming that the account has been deleted.</td>
                     </tr>

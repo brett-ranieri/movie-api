@@ -1,12 +1,20 @@
 const express = require('express'),
     bodyParser = require('body-parser'),
     uuid = require('uuid'),
-    morgan = require('morgan');
+    morgan = require('morgan'),
+    mongoose = require('mongoose');
+//all above are requirements
+const Models = require('./models.js'); //requires models.js file
+//below refers to mongoose models defined in models.js file
+const Movies = Models.Movie; 
+const Users = Models.User;
 
 const app = express();
-
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body-parser and makes sure middleware is being used. MUST be before any other endpoint middleware.
 
+mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true}); //allows mongoose to connect to database
+/*
 let users = [
     {
         id: 166,
@@ -37,7 +45,7 @@ let users = [
 
 let movies = [
     {
-        "Title": "The Mighty Ducks",
+        "Title": "The Mighty Ducks - In Memory",
         "Description":"After being pulled over for drunk driving, Minneapolis-based attorney Gordon Bombay is sentenced to 500 hours of community service, coaching youth hockey. There he meets the District 5 peewee hockey team perennial losers who finish at the bottom of the league standings year after year. They are shut out every game and lose by at least five goals. The players learn Bombay was once a player for the Hawks and the team in the same league but left hockey because of the embarrassment that followed after a failed attempt at a penalty shot at the end of regulation causing them to lose in overtime costing them a peewee championship. With the help of Coach Bombay and a desperately needed infusion of cash and equipment from Bombay's law firm, the players learn the fundamentals of the sport. Soon enough the District 5 team now christened the Ducks after Bombay's employer Gerald Ducksworth start winning games and manage to make the playoffs, reaching the finals and adding new player Adam Banks, an ex-Hawk who is a talented player and an asset for the Ducks. Bombay faces the Hawks, the team he grew up playing for still led by Jack Reilly, the same coach Bombay played for. Fittingly, the Ducks win the title game on a penalty shot by Bombay's protege Charlie.",
         "Genre": {
             "Name":"Sports",
@@ -117,119 +125,192 @@ let movies = [
         "Featured":false
     },
 ]
+*/
 // Logging
 app.use(morgan('common'));
 
 //CREATE - Add New User
 app.post('/users', (req, res) => {
-    const newUser = req.body;
-
-    if(newUser.name) {
-       newUser.id = uuid.v4();
-       users.push(newUser);
-       res.status(201).json(newUser); 
-    } else {
-        const message = "You must add a Name to create a New User";
-        res.status(400).send(message);
-    }
+    Users.findOne({ Username: req.body.Username })
+        .then((user) => {
+            if (user) {
+                return res.status(400).send(req.body.Username + ' already exists');
+            } else {
+                Users
+                    .create({
+                        Name: req.body.Name,
+                        Username: req.body.Username,
+                        Password: req.body.Password,
+                        Email: req.body.Email,
+                        Birthday: req.body.Birthday
+                    })
+                    .then((user) => {res.status(201).json(user) })
+                .catch((error) => {
+                    console.error(error);
+                    res.status(500).send('Error: ' + error);
+                })
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
 });
 
-//UPDATE - Allow User to update username
-app.put('/users/:id', (req, res) => {
-    const { id } = req.params;
-    const updatedUser = req.body;
-    let user = users.find( user => user.id == id); // used == because id will be presented as a number AND a string, need them to be truthy. If want to use === need to cast to make string a number or vice versa 
-    
-    if (user) {
-        user.name = updatedUser.name;
-        res.status(200).json(user);
-    } else {
-        res.status(400).send('No user was found to match this name');
-    }
+//UPDATE - Allow User to update info by username
+app.put('/users/:Username', (req, res) => {
+    Users.findOneAndUpdate({ Username: req.params.Username }, {
+        $set:
+            {
+                Username: req.body.Username,
+                Password: req.body.Password,
+                Email: req.body.Email,
+                Birthday: req.body.Birthday
+            }
+    },
+    { new: true }, //this line makes sure that updated document is returned
+    (err, updatedUser) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        } else {
+            res.json(updatedUser);
+        }
+    });
 });
 
 //UPDATE - Allow User to add a movie to favorites list
-app.put('/users/:id/:movieTitle', (req, res) => {
-    const { id, movieTitle } = req.params;
-    let user = users.find( user => user.id == id); // used == because id will be presented as a number AND a string, need them to be truthy. If want to use === need to cast to make string a number or vice versa 
-    
-    if (user) {
-        user.favoriteMovies.push(movieTitle);
-        res.status(200).send(`${movieTitle} has been added to ${user.name}'s list!`)
-    } else {
-        res.status(400).send('No user was found to match this name. Can\'t add a movie to a list that doesn\'t exist...');
-    }
+app.put('/users/:Username/movies/:_id', (req, res) => {
+    Users.findOneAndUpdate({ Username: req.params.Username }, {
+        $addToSet: { FavoriteMovies: req.params._id }
+    },
+    { new: true }, //this line makes sure that the updated document is returned
+    (err, updatedUser) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        } else {
+            res.status(201).json(updatedUser);
+            console.log(req.params._id);
+        }
+    });
 });
 
 //DELETE - Allow User to remove a movie from favorites list
-app.delete('/users/:id/remove/:movieTitle', (req, res) => {
-    const { id, movieTitle } = req.params;
-    let user = users.find( user => user.id == id); // used == because id will be presented as a number AND a string, need them to be truthy. If want to use === need to cast to make string a number or vice versa 
-    
-    if (user) {
-        user.favoriteMovies.pop(movieTitle);
-        res.status(200).send(`${movieTitle} has been removed ${user.name}'s list.`)
-    } else {
-        res.status(400).send('No user was found to match this name. Can\'t remove a movie from a list that doesn\'t exist...');
-    }
+app.delete('/users/:Username/remove/:MovieID', (req, res) => {
+    Users.findOneAndUpdate({ Username: req.params.Username }, {
+        $pull: { FavoriteMovies: req.params.MovieID }
+    },
+    { new: true },
+    (err, updatedUser) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        } else {
+            res.status(200).json(updatedUser);
+        }
+    });
 });
 
 //DELETE - Allow User to remove their account
-app.delete('/users/:id/removeAccount', (req, res) => {
-    const { id } = req.params;
-    let user = users.find( user => user.id == id);
-    
-    if (user) {
-        users = users.filter(user => user.id != id); //filters users array, removes anything that matches id requested and removes from array
-        res.status(200).send(`${user.name}'s account has been deleted.`);
-    } else {
-        res.status(400).send('No user was found. Can\'t remove an account that doesn\'t exist...');
-    }
+app.delete('/users/:Username', (req, res) => {
+    Users.findOneAndRemove({ Username: req.params.Username })
+        .then((user) => {
+            if(!user) {
+                res.status(400).send(req.params.Username + ' was not found and could not be deleted.');
+            } else {
+                res.status(200).send('The account belonging to ' + req.params.Username + ' has been succesfully deleted.');
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
 });
 
 // READ - Return list of all Users
 app.get('/users', (req, res) => {
-    res.status(200).json(users);
+    Users.find()
+        .then((users) => {
+            res.status(201).json(users);
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
+});
+
+// READ - Get a user by username
+app.get('/users/:Username', (req, res) => {
+    Users.findOne({ Username: req.params.Username })
+        .then((user) => {
+            res.status(200).json(user);
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
 });
 
 // READ - Return list of all movies to user
 app.get('/movies', (req, res) => {
-    res.status(200).json(movies);
+    Movies.find()
+        .then((movies) => {
+            res.status(201).json(movies);
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
 });
 // READ - Return data about a single movie
-app.get('/movies/:title', (req, res) => {
-    const { title } = req.params;
-    const movie = movies.find( movie => movie.Title === title);
-
-    if (movie) {
-        res.status(200).json(movie);
-    } else {
-        res.status(400).send("No movie was found to match this title. Maybe you should add it?")
-    }
+app.get('/movies/:Title', (req, res) => {
+    Movies.findOne({ Title: req.params.Title })
+        .then((movie) => {
+            res.status(200).json(movie);
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
 });
-// READ - Return data about Genre of single movie
-app.get('/movies/genres/:genreName', (req, res) => {
-    const { genreName } = req.params;
-    const genre = movies.find( movie => movie.Genre.Name === genreName).Genre;
-
-    if (genre) {
-        res.status(200).json(genre);
-    } else {
-        res.status(400).send("No genre was found to match. You sure it exists?")
-    }
+// READ - Return description about Genre from Genre name
+app.get('/movies/genre/:genreName', (req, res) => {
+    Movies.findOne({ 'Genre.Name': req.params.genreName })
+        .then((movie) => {
+            res.status(200).json(movie.Genre);
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
 });
 // READ - Return data about Director by name
 app.get('/movies/directors/:directorName', (req, res) => {
-    const { directorName } = req.params;
-    const director = movies.find( movie => movie.Director.Name === directorName).Director;
-    console.log(directorName);
-    if (director) {
-        res.status(200).json(director);
-    } else {
-        res.status(400).send("No director was found to match this name. Maybe you should add them?")
-    }
+    Movies.findOne({ 'Director.Name': req.params.directorName })
+        .then((movie) => {
+            res.status(200).json(movie.Director);
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
 });
-
+// READ - Return data about a movie with specific Genre AND a specific director
+app.get('/movies/genres/:genreName/directors/:directorName', (req, res) => {
+    Movies.findOne({ 'Genre.Name': req.params.genreName, 'Director.Name': req.params.directorName })
+        .then((movie) => {
+            if(!movie) {
+                res.status(400).send('No movie found with ' + req.params.genreName + ' and ' + req.params.directorName);
+            } else {
+                res.status(200).json(movie);
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).send('Error: ' + error);
+        });
+});
 //Static Files
 app.use(express.static('public'));
 
