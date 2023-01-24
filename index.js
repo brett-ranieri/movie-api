@@ -14,6 +14,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body-parser and makes sure middleware is being used. MUST be before any other endpoint middleware.
 
+const port = 3000;
 ////////// CROSS-ORIGIN RESOURCE SHARING ////////////////////////
 const cors = require('cors');
 app.use(cors());//must be before auth and any route middleware
@@ -253,6 +254,8 @@ app.use((err, req, res, next) => {
 })
 
 // set port for which to listen for requests
-app.listen(8080, () => {
-    console.log("Your app is listening on port 8080.");
+app.listen(port, () => {
+    console.log("App is listening on port ${port}`");
 });
+
+module.exports = app;
