@@ -37,7 +37,7 @@ let auth = require('./auth')(app);//must be AFTER bodyParser
 const passport = require('passport');//must be AFTER auth
 require('./passport');
 
-mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true}); //allows mongoose to connect to database
+//mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true}); //allows mongoose to connect to database
 
 // Logging
 app.use(morgan('common'));
