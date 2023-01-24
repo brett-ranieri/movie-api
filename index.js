@@ -5,7 +5,7 @@ const express = require('express'),
     mongoose = require('mongoose');
 //all above are requirements
 const Models = require('./models.js'); //requires models.js file
-const { check, validationResult } = require('express-validatior');
+const { check, validationResult } = require('express-validator');
 //below refers to mongoose models defined in models.js file
 const Movies = Models.Movie; 
 const Users = Models.User;
