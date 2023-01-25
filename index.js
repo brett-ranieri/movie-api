@@ -14,7 +14,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body-parser and makes sure middleware is being used. MUST be before any other endpoint middleware.
 
-//const port = 3000;
+const port = 3000;
 ////////// CROSS-ORIGIN RESOURCE SHARING ////////////////////////
 const cors = require('cors');
 app.use(cors());//must be before auth and any route middleware
