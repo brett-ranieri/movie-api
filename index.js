@@ -100,7 +100,11 @@ app.post('/users',
 //UPDATE - Allow User to update info by username
 /////////// CURRENT PERMISSIONS - SEEMS USERS CAN UPDATE INFO OF ANY USER //////////
 // Do I need to add If comparing username of param to username of token? Or will this be taken care of by another authentication step at some point?
-app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.put('/users/:Username', passport.authenticate('jwt', { session: false }), 
+    [check('Username', 'Username is required').isLength({min: 5}),
+    check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
+    check('Email', 'Email does not appear to be valid').isEmail()
+], (req, res) => {
     Users.findOneAndUpdate({ Username: req.params.Username }, {
         $set:
             {
