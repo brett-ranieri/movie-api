@@ -16,7 +16,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body-parser and makes sure middleware is being used. MUST be before any other endpoint middleware.
 
-//const port = 3000; //from tutorial of how to set up Vercel
+const port = 3000; //from tutorial of how to set up Vercel
 
 ////////// CROSS-ORIGIN RESOURCE SHARING ////////////////////////
 //must be before auth and any route middleware
