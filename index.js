@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body
 const cors = require('cors');
 app.use(cors());//must be before auth and any route middleware
 
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com']; //varaiable that lists all Origins that will be given permissions
+let allowedOrigins = ['http://testsite.com']; //varaiable that lists all Origins that will be given permissions
 
 app.use(cors({ //compares domains of incoming requests with allowed Origin list and either allows or returns an error.
     origin: (origin, callback) => {
@@ -37,7 +37,10 @@ let auth = require('./auth')(app);//must be AFTER bodyParser
 const passport = require('passport');//must be AFTER auth
 require('./passport');
 
-//mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true}); //allows mongoose to connect to database
+//Connect to Local Database
+//mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true});
+//Connect to Online Database
+mongoose.connect('process.env.connection_uri', {useNewUrlParser: true, useUnifiedTopology: true});
 
 // Logging
 app.use(morgan('common'));
