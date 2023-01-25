@@ -3,9 +3,11 @@ const express = require('express'),
     uuid = require('uuid'),
     morgan = require('morgan'),
     mongoose = require('mongoose');
-//all above are requirements
-const Models = require('./models.js'); //requires models.js file
+
+//require models.js file
+const Models = require('./models.js');
 const { check, validationResult } = require('express-validator');
+
 //below refers to mongoose models defined in models.js file
 const Movies = Models.Movie; 
 const Users = Models.User;
@@ -14,11 +16,15 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body-parser and makes sure middleware is being used. MUST be before any other endpoint middleware.
 
-const port = 3000;
-////////// CROSS-ORIGIN RESOURCE SHARING ////////////////////////
-const cors = require('cors');
-app.use(cors());//must be before auth and any route middleware
+//const port = 3000; //from tutorial of how to set up Vercel
 
+////////// CROSS-ORIGIN RESOURCE SHARING ////////////////////////
+//must be before auth and any route middleware
+const cors = require('cors');
+app.use(cors());
+
+//Below can be used to restrict access to only certain origins, commented out because prompt requests access for ALL origins.
+/*
 let allowedOrigins = ['http://testsite.com']; //varaiable that lists all Origins that will be given permissions
 
 app.use(cors({ //compares domains of incoming requests with allowed Origin list and either allows or returns an error.
@@ -31,6 +37,7 @@ app.use(cors({ //compares domains of incoming requests with allowed Origin list 
         return callback(null, true);
     }
 }));
+*/
 
 let auth = require('./auth')(app);//must be AFTER bodyParser
 
@@ -44,6 +51,12 @@ mongoose.connect(process.env.connection_uri, {useNewUrlParser: true, useUnifiedT
 
 // Logging
 app.use(morgan('common'));
+
+// GET requests - Initial Routing
+app.get('/', (req, res) => {
+    let responseText = "Welcome to my Movie Database! It's a work in progress, so keep checking back for more updates.";
+    res.send(responseText);
+})
 
 //CREATE - Add New User
 app.post('/users', 
@@ -85,8 +98,8 @@ app.post('/users',
 });
 
 //UPDATE - Allow User to update info by username
-/////////////////////////////// CURRENT PERMISSIONS - USERS CAN UPDATE INFO OF ANY USER //////////////////////////
-// Need to add If comparing username of param to username of token?
+/////////// CURRENT PERMISSIONS - SEEMS USERS CAN UPDATE INFO OF ANY USER //////////
+// Do I need to add If comparing username of param to username of token? Or will this be taken care of by another authentication step at some point?
 app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOneAndUpdate({ Username: req.params.Username }, {
         $set:
@@ -243,22 +256,14 @@ app.get('/movies/genres/:genreName/directors/:directorName', passport.authentica
 });
 //Static Files
 app.use(express.static('public'));
-
-// GET requests - Routing
-app.get('/', (req, res) => {
-    let responseText = "Welcome to my Movie Database! It's a work in progress, so keep checking back for more updates.";
-    res.send(responseText);
-})
-
 //Error Handling
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send("Something is broken! :(");
 })
-
 // set port for which to listen for requests
 app.listen(port, () => {
     console.log("App is listening on port ${port}`");
 });
-
+//Export so it canbe read by Vercel
 module.exports = app;
