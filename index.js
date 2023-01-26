@@ -267,6 +267,8 @@ app.get('/movies/genres/:genreName/directors/:directorName', passport.authentica
 });
 //Static Files
 app.use(express.static('public'));
+
+app.use(express.json());
 //Error Handling
 app.use((err, req, res, next) => {
     console.error(err.stack);
