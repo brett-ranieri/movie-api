@@ -3,11 +3,9 @@ const express = require('express'),
     uuid = require('uuid'),
     morgan = require('morgan'),
     mongoose = require('mongoose');
-
 //require models.js file
 const Models = require('./models.js');
 const { check, validationResult } = require('express-validator');
-
 //below refers to mongoose models defined in models.js file
 const Movies = Models.Movie; 
 const Users = Models.User;
@@ -38,12 +36,10 @@ let auth = require('./auth')(app);//must be AFTER bodyParser
 
 const passport = require('passport');//must be AFTER auth
 require('./passport');
-
 //Connect to Local Database
 // mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true});
 //Connect to Online Database
 mongoose.connect(process.env.connection_uri, {useNewUrlParser: true, useUnifiedTopology: true});
-
 // Logging
 app.use(morgan('common'));
 // GET requests - Initial Routing
