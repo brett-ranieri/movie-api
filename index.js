@@ -101,7 +101,7 @@ app.post('/users', [
 /////////// CURRENT PERMISSIONS - SEEMS USERS CAN UPDATE INFO OF ANY USER //////////
 // Do I need to add If comparing username of param to username of token? Or will this be taken care of by another authentication step at some point?
 app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if(req.body.Username !== "") {
+    if(req.body.Username) {
         check('Username', 'Username must be at least 5 characters long').isLength({min: 5})
         check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric()
     }
