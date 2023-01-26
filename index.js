@@ -45,7 +45,7 @@ const passport = require('passport');//must be AFTER auth
 require('./passport');
 
 //Connect to Local Database
-//mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true});
+// mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true});
 //Connect to Online Database
 mongoose.connect(process.env.connection_uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
@@ -100,18 +100,19 @@ app.post('/users', [
 //UPDATE - Allow User to update info by username
 /////////// CURRENT PERMISSIONS - SEEMS USERS CAN UPDATE INFO OF ANY USER //////////
 // Do I need to add If comparing username of param to username of token? Or will this be taken care of by another authentication step at some point?
-app.put('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
-    if(req.body.Username) {
-        req.check('Username', 'Username must be at least 5 characters long').isLength({min: 5})
-        req.check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric()
-    }
-    
-    let errors = validationResult(req); //check validation object for errors
+app.put('/users/:Username', [
+    check('Username', 'Username must be at least 5 characters long').isLength({min: 5}),
+    check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
+    check('Email', 'Email does not appear to be valid').isEmail().optional(), //optional is necessary to prevent validation from checking empty field
+    passport.authenticate('jwt', { session: false })], (req, res) => {
+        let errors = validationResult(req); //check validation object for errors
+        if(!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array()});
+        }
 
-    if(!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array()});
-    }
-    let hashedPassword = Users.hashPassword(req.body.Password);
+        let hashedPassword
+        if (req.body.Password) { hashedPassword = Users.hashPassword(req.body.Password);}
+    
     Users.findOneAndUpdate({ Username: req.params.Username }, {
         $set:
             {
@@ -274,7 +275,7 @@ app.use((err, req, res, next) => {
 })
 // set port for which to listen for requests
 app.listen(port, () => {
-    console.log("App is listening on port ${port}`");
+    console.log(`App is listening on port ${port}`);
 });
-//Export so it canbe read by Vercel
+//Export so it can be read by Vercel
 module.exports = app;
