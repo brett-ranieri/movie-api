@@ -102,6 +102,7 @@ app.post('/users', [
 // Do I need to add If comparing username of param to username of token? Or will this be taken care of by another authentication step at some point?
 app.put('/users/:Username', [
     check('Username', 'Username must be at least 5 characters long').isLength({min: 5}),
+    check('Username', 'Wrong User - Action Unauthorized').contains(req.params.Username),
     check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
     check('Email', 'Email does not appear to be valid').isEmail().optional(), //optional is necessary to prevent validation from checking empty field
     passport.authenticate('jwt', { session: false })], (req, res) => {
