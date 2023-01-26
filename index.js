@@ -15,12 +15,10 @@ const Users = Models.User;
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body-parser and makes sure middleware is being used. MUST be before any other endpoint middleware.
-
-////////// CROSS-ORIGIN RESOURCE SHARING ////////////////////////
+///////// CROSS-ORIGIN RESOURCE SHARING /////////
 //must be before auth and any route middleware
 const cors = require('cors');
 app.use(cors());
-
 //Below can be used to restrict access to only certain origins, commented out because prompt requests access for ALL origins.
 /*
 let allowedOrigins = ['http://testsite.com']; //varaiable that lists all Origins that will be given permissions
@@ -36,7 +34,6 @@ app.use(cors({ //compares domains of incoming requests with allowed Origin list 
     }
 }));
 */
-
 let auth = require('./auth')(app);//must be AFTER bodyParser
 
 const passport = require('passport');//must be AFTER auth
@@ -49,13 +46,11 @@ mongoose.connect(process.env.connection_uri, {useNewUrlParser: true, useUnifiedT
 
 // Logging
 app.use(morgan('common'));
-
 // GET requests - Initial Routing
 app.get('/', (req, res) => {
     let responseText = "Welcome to my Movie Database! It's a work in progress, so keep checking back for more updates.";
     res.send(responseText);
 })
-
 //CREATE - Add New User
 app.post('/users', [
     check('Username', 'Username must be at least 5 characters long').isLength({min: 5}),
@@ -94,10 +89,8 @@ app.post('/users', [
             res.status(500).send('Error: ' + error);
         });
 });
-
 //UPDATE - Allow User to update info by username
-/////////// CURRENT PERMISSIONS - SEEMS USERS CAN UPDATE INFO OF ANY USER //////////
-// Do I need to add If comparing username of param to username of token? Or will this be taken care of by another authentication step at some point?
+/////////// CURRENT PERMISSIONS - SEEMS USERS CAN UPDATE INFO OF ANY USER??? //////////
 app.put('/users/:Username', [
     check('Username', 'Username must be at least 5 characters long').isLength({min: 5}),
     check('Username', 'Username contains non alphanumeric characters - not allowed').isAlphanumeric(),
@@ -131,7 +124,6 @@ app.put('/users/:Username', [
         }
     });
 });
-
 //UPDATE - Allow User to add a movie to favorites list
 app.put('/users/:Username/movies/:_id', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOneAndUpdate({ Username: req.params.Username }, {
@@ -148,7 +140,6 @@ app.put('/users/:Username/movies/:_id', passport.authenticate('jwt', { session: 
         }
     });
 });
-
 //DELETE - Allow User to remove a movie from favorites list
 app.delete('/users/:Username/remove/:MovieID', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOneAndUpdate({ Username: req.params.Username }, {
@@ -164,7 +155,6 @@ app.delete('/users/:Username/remove/:MovieID', passport.authenticate('jwt', { se
         }
     });
 });
-
 //DELETE - Allow User to remove their account
 app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOneAndRemove({ Username: req.params.Username })
@@ -180,7 +170,6 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
             res.status(500).send('Error: ' + error);
         });
 });
-
 // READ - Return list of all Users 
 //////////////////// NEED TO UPDATE TO ONLY RETURN PUBLIC DATA...NOT PASSWORDS /////////////////////////
 app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -193,7 +182,6 @@ app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) =
             res.status(500).send('Error: ' + error);
         });
 });
-
 // READ - Get a user by username
 app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOne({ Username: req.params.Username })
@@ -205,7 +193,6 @@ app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (r
             res.status(500).send('Error: ' + error);
         });
 });
-
 // READ - Return list of all movies to user
 app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
     Movies.find()
