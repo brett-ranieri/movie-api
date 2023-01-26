@@ -45,6 +45,8 @@ require('./passport');
 //Connect to Local Database
 // mongoose.connect('mongodb://localhost:27017/myMovieDB', {useNewUrlParser: true, useUnifiedTopology: true});
 //Connect to Online Database
+console.log(process.env.connection_uri);
+
 mongoose.connect(process.env.connection_uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
 // Logging
