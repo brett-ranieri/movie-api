@@ -16,8 +16,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));//both lines here import body-parser and makes sure middleware is being used. MUST be before any other endpoint middleware.
 
-const port = 3000; //from tutorial of how to set up Vercel
-
 ////////// CROSS-ORIGIN RESOURCE SHARING ////////////////////////
 //must be before auth and any route middleware
 const cors = require('cors');
@@ -116,6 +114,7 @@ app.put('/users/:Username', [
     Users.findOneAndUpdate({ Username: req.params.Username }, {
         $set:
             {
+                Name: req.body.Name,
                 Username: req.body.Username,
                 Password: hashedPassword,
                 Email: req.body.Email,
@@ -274,6 +273,7 @@ app.use((err, req, res, next) => {
     res.status(500).send("Something is broken! :(");
 })
 // set port for which to listen for requests
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`App is listening on port ${port}`);
 });
