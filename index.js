@@ -190,7 +190,7 @@ app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (r
         });
 });
 // READ - Return list of all movies to user
-app.get('/movies', (req, res) => {
+app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
     Movies.find()
         .then((movies) => {
             res.status(201).json(movies);
