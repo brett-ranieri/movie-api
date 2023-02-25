@@ -23,7 +23,7 @@ let allowedOrigins = [
 	"http://localhost:8080",
 	"http://testsite.com",
 	"http://localhost:1234",
-	"https://mymovie-brettranieri.netlify.app",
+	"https://mymovieapp-brettranieri.netlify.app",
 ]; //varaiable that lists all Origins that will be given permissions
 
 app.use(
