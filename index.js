@@ -16,22 +16,33 @@ app.use(bodyParser.urlencoded({ extended: true })); //both lines here import bod
 ///////// CROSS-ORIGIN RESOURCE SHARING /////////
 //must be before auth and any route middleware
 const cors = require("cors");
-app.use(cors());
+// app.use(cors());
 //Below can be used to restrict access to only certain origins, commented out because prompt requests access for ALL origins.
-/*
-let allowedOrigins = ['http://testsite.com']; //varaiable that lists all Origins that will be given permissions
 
-app.use(cors({ //compares domains of incoming requests with allowed Origin list and either allows or returns an error.
-    origin: (origin, callback) => {
-        if(!origin) return callback (null, true);
-        if(allowedOrigins.indexOf(origin) === -1){ //if a specific origin is not found in allowed origin list
-            let message = 'The CORS policy for this application doesn\'t allow access from origin ' + origin;
-            return callback(new Error(message ), false);
-        }
-        return callback(null, true);
-    }
-}));
-*/
+let allowedOrigins = [
+	"http://localhost:8080",
+	"http://testsite.com",
+	"http://localhost:1234",
+	"https://mymovie.brett-ranieri.netlify.app",
+]; //varaiable that lists all Origins that will be given permissions
+
+app.use(
+	cors({
+		//compares domains of incoming requests with allowed Origin list and either allows or returns an error.
+		origin: (origin, callback) => {
+			if (!origin) return callback(null, true);
+			if (allowedOrigins.indexOf(origin) === -1) {
+				//if a specific origin is not found in allowed origin list
+				let message =
+					"The CORS policy for this application doesn't allow access from origin " +
+					origin;
+				return callback(new Error(message), false);
+			}
+			return callback(null, true);
+		},
+	})
+);
+
 let auth = require("./auth")(app); //must be AFTER bodyParser
 
 const passport = require("passport"); //must be AFTER auth
