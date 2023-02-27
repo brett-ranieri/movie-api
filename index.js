@@ -266,6 +266,21 @@ app.get(
 			});
 	}
 );
+// READ - Get a user by userId
+app.get(
+	"/users/:_id",
+	passport.authenticate("jwt", { session: false }),
+	(req, res) => {
+		Users.findOne({ _id: req.params._id })
+			.then((user) => {
+				res.status(200).json(user);
+			})
+			.catch((error) => {
+				console.error(error);
+				res.status(500).send("Error: " + error);
+			});
+	}
+);
 // READ - Return list of all movies to user
 app.get(
 	"/movies",
