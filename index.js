@@ -24,6 +24,7 @@ let allowedOrigins = [
 	"http://testsite.com",
 	"http://localhost:1234",
 	"https://mymovieapp-brettranieri.netlify.app",
+	"http://localhost:4200",
 ]; //varaiable that lists all Origins that will be given permissions
 
 app.use(
@@ -34,8 +35,7 @@ app.use(
 			if (allowedOrigins.indexOf(origin) === -1) {
 				//if a specific origin is not found in allowed origin list
 				let message =
-					"The CORS policy for this application doesn't allow access from origin " +
-					origin;
+					"The CORS policy for this application doesn't allow access from origin " + origin;
 				return callback(new Error(message), false);
 			}
 			return callback(null, true);
@@ -118,10 +118,7 @@ app.put(
 		check("Username", "Username must be at least 5 characters long")
 			.isLength({ min: 5 })
 			.optional(),
-		check(
-			"Username",
-			"Username contains non alphanumeric characters - not allowed"
-		)
+		check("Username", "Username contains non alphanumeric characters - not allowed")
 			.isAlphanumeric()
 			.optional(),
 		check("Email", "Email does not appear to be valid").isEmail().optional(), //optional is necessary to prevent validation from checking empty field
@@ -207,110 +204,80 @@ app.delete(
 	}
 );
 //DELETE - Allow User to remove their account
-app.delete(
-	"/users/:Username",
-	passport.authenticate("jwt", { session: false }),
-	(req, res) => {
-		Users.findOneAndRemove({ Username: req.params.Username })
-			.then((user) => {
-				if (!user) {
-					res
-						.status(400)
-						.send(
-							req.params.Username + " was not found and could not be deleted."
-						);
-				} else {
-					res
-						.status(200)
-						.send(
-							"The account belonging to " +
-								req.params.Username +
-								" has been succesfully deleted."
-						);
-				}
-			})
-			.catch((error) => {
-				console.error(error);
-				res.status(500).send("Error: " + error);
-			});
-	}
-);
+app.delete("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Users.findOneAndRemove({ Username: req.params.Username })
+		.then((user) => {
+			if (!user) {
+				res.status(400).send(req.params.Username + " was not found and could not be deleted.");
+			} else {
+				res
+					.status(200)
+					.send(
+						"The account belonging to " + req.params.Username + " has been succesfully deleted."
+					);
+			}
+		})
+		.catch((error) => {
+			console.error(error);
+			res.status(500).send("Error: " + error);
+		});
+});
 // READ - Return list of all Users
 //////////////////// NEED TO UPDATE TO ONLY RETURN PUBLIC DATA...NOT PASSWORDS /////////////////////////
-app.get(
-	"/users",
-	passport.authenticate("jwt", { session: false }),
-	(req, res) => {
-		Users.find()
-			.then((users) => {
-				res.status(201).json(users);
-			})
-			.catch((error) => {
-				console.error(error);
-				res.status(500).send("Error: " + error);
-			});
-	}
-);
+app.get("/users", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Users.find()
+		.then((users) => {
+			res.status(201).json(users);
+		})
+		.catch((error) => {
+			console.error(error);
+			res.status(500).send("Error: " + error);
+		});
+});
 // READ - Get a user by username
-app.get(
-	"/users/:Username",
-	passport.authenticate("jwt", { session: false }),
-	(req, res) => {
-		Users.findOne({ Username: req.params.Username })
-			.then((user) => {
-				res.status(200).json(user);
-			})
-			.catch((error) => {
-				console.error(error);
-				res.status(500).send("Error: " + error);
-			});
-	}
-);
+app.get("/users/:Username", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Users.findOne({ Username: req.params.Username })
+		.then((user) => {
+			res.status(200).json(user);
+		})
+		.catch((error) => {
+			console.error(error);
+			res.status(500).send("Error: " + error);
+		});
+});
 // READ - Get a user by userId
-app.get(
-	"/users/:_id",
-	passport.authenticate("jwt", { session: false }),
-	(req, res) => {
-		Users.findOne({ _id: ObjectId(req.params._id) })
-			.then((user) => {
-				res.status(200).json(user);
-			})
-			.catch((error) => {
-				console.error(error);
-				res.status(500).send("Error: " + error);
-			});
-	}
-);
+app.get("/users/:_id", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Users.findOne({ _id: ObjectId(req.params._id) })
+		.then((user) => {
+			res.status(200).json(user);
+		})
+		.catch((error) => {
+			console.error(error);
+			res.status(500).send("Error: " + error);
+		});
+});
 // READ - Return list of all movies to user
-app.get(
-	"/movies",
-	passport.authenticate("jwt", { session: false }),
-	(req, res) => {
-		Movies.find()
-			.then((movies) => {
-				res.status(201).json(movies);
-			})
-			.catch((error) => {
-				console.error(error);
-				res.status(500).send("Error: " + error);
-			});
-	}
-);
+app.get("/movies", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Movies.find()
+		.then((movies) => {
+			res.status(201).json(movies);
+		})
+		.catch((error) => {
+			console.error(error);
+			res.status(500).send("Error: " + error);
+		});
+});
 // READ - Return data about a single movie
-app.get(
-	"/movies/:Title",
-	passport.authenticate("jwt", { session: false }),
-	(req, res) => {
-		Movies.findOne({ Title: req.params.Title })
-			.then((movie) => {
-				res.status(200).json(movie);
-			})
-			.catch((error) => {
-				console.error(error);
-				res.status(500).send("Error: " + error);
-			});
-	}
-);
+app.get("/movies/:Title", passport.authenticate("jwt", { session: false }), (req, res) => {
+	Movies.findOne({ Title: req.params.Title })
+		.then((movie) => {
+			res.status(200).json(movie);
+		})
+		.catch((error) => {
+			console.error(error);
+			res.status(500).send("Error: " + error);
+		});
+});
 // READ - Return description about Genre from Genre name
 app.get(
 	"/movies/genre/:genreName",
@@ -355,10 +322,7 @@ app.get(
 					res
 						.status(400)
 						.send(
-							"No movie found with " +
-								req.params.genreName +
-								" and " +
-								req.params.directorName
+							"No movie found with " + req.params.genreName + " and " + req.params.directorName
 						);
 				} else {
 					res.status(200).json(movie);
