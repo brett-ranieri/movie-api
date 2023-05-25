@@ -247,6 +247,7 @@ app.get("/users/:Username", passport.authenticate("jwt", { session: false }), (r
 });
 // READ - Get a user by userId
 app.get("/users/:_id", passport.authenticate("jwt", { session: false }), (req, res) => {
+	console.log("from API", req.params._id);
 	Users.findOne({ _id: req.params._id })
 		.then((user) => {
 			res.status(200).json(user);
