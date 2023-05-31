@@ -215,7 +215,7 @@ app.delete("/users/:Username", passport.authenticate("jwt", { session: false }),
 					.send(
 						"The account belonging to " + req.params.Username + " has been succesfully deleted."
 					);
-				console.log("the res ", res);
+				console.log("the res ", res.status);
 			}
 		})
 		.catch((error) => {
