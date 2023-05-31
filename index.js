@@ -210,12 +210,11 @@ app.delete("/users/:Username", passport.authenticate("jwt", { session: false }),
 			if (!user) {
 				res.status(400).send(req.params.Username + " was not found and could not be deleted.");
 			} else {
-				res
-					.status(200)
-					.send(
-						"The account belonging to " + req.params.Username + " has been succesfully deleted."
-					);
-				console.log("the res ", res.status);
+				res.status(200);
+				// 	.send(
+				// 		"The account belonging to " + req.params.Username + " has been succesfully deleted."
+				// 	);
+				// console.log("the res ", res.status);
 			}
 		})
 		.catch((error) => {
