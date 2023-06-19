@@ -26,6 +26,7 @@ let allowedOrigins = [
 	"https://mymovieapp-brettranieri.netlify.app",
 	"http://localhost:4200",
 	"https://brett-ranieri.github.io/myMovie-Angular-client",
+	"https://brett-ranieri.github.io",
 ]; //varaiable that lists all Origins that will be given permissions
 
 app.use(
