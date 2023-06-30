@@ -35,6 +35,10 @@ Start - ``` $ run npm start ```
 
 Development - ``` $ run npm dev ```
 
+## How to access Docs created by JSDoc
+
+Open `global.html` file located in out folder in browser.
+
 ## Project Dependencies
 
  - ``` "bcryptjs": "^2.4.3" ```   
