@@ -28,6 +28,7 @@ let allowedOrigins = [
 	"https://brett-ranieri.github.io/myMovie-Angular-client",
 	"https://brett-ranieri.github.io",
 	"https://brett-ranieri.github.io/myMovie-client",
+	"https://localhost:3000",
 ]; //varaiable that lists all Origins that will be given permissions
 
 app.use(
